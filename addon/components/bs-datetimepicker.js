@@ -58,10 +58,25 @@ var bsDateTimePickerComponent = Ember.Component.extend({
           if (Ember.isNone(ev.date) || ev.date === false) {
             this.sendAction('updateDate', undefined);
           } else if (!ev.date.isSame(this.getAttr('date'))) {
+            let checkHour = (ev.date.utcOffset()/60) + ev.date.hour();
+            let dateOnly = false;
+            if ((this.getAttr('format') === 'DD-MM-YYYY' || this.getAttr('format') === 'YYYY-MM-DD' || this.getAttr('format') === 'YYYY-DD-MM' || this.getAttr('MM-DD-YYYY')) && checkHour  > 0 && checkHour < 24) {
+              dateOnly = true;
+            }
             if (this.attrs.forceDateOutput) {
-              this.sendAction('updateDate', ev.date.toDate());
+              if (dateOnly) {
+                this.sendAction('updateDate', moment(ev.date).utc().add(ev.date.utcOffset(), 'm').toDate());
+              }
+              else {
+                this.sendAction('updateDate', ev.date.toDate());
+              }
             } else {
-              this.sendAction('updateDate', ev.date);
+              if (dateOnly) {
+                this.sendAction('updateDate', moment(ev.date).utc().add(ev.date.utcOffset(), 'm'));
+              }
+              else {
+                this.sendAction('updateDate', ev.date);
+              }
             }
           }
         }
